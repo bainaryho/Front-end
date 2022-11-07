@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front-end 과제</title>
+    <style>
+        .wrap {
+
+        }
+
+        header {
+            font-size: 40px;
+            text-align: center;
+        }
+
+        .container {
+
+        }
+
+        .tbl {
+            width: 98%;
+            border-top: 1px solid #444444;
+            border: 1px solid #ffffff;
+        }
+        th, td {
+            border-bottom: 1px solid #444444;
+            padding: 10px;
+            text-align: center;
+        }
+        th:nth-child(1), th:nth-child(2),th:nth-child(4),th:nth-child(9), th:nth-child(10), th:nth-child(11) {width:5%;}
+        thead tr {
+            background-color: #0d47a1;
+            color: #ffffff;
+        }
+
+        tbody tr:nth-child(2n) {
+            background-color: #bbdefb;
+        }
+        tbody tr:nth-child(2n+1) {
+            background-color: #e3f2fd;
+        }
+        input {
+            width: 90%;
+            height: 1.5rem;
+            border: 1px solid #444444;
+            border-radius: 4px;
+            padding-left: 5px;
+            border: none;
+            background: transparent;
+        }
+
+        .btn-div {
+            style: flex;
+        }
+    </style>
+</head>
+<body onload=addTr()>
+    <div class="wrap">
+        <header>
+            Front-end 과제
+        </header>
+        <div class="container">
+            <div class="btn-div">
+                <button onclick="addTr()">추가</button>
+                <button onclick="remove()">삭제</button>
+                <button onclick="save()">저장</button>
+                <button onclick="sort()">과목정렬</button>
+            </div>
+            <table class="tbl">
+                <thead>
+                    <th>이수</th>
+                    <th>필수</th>
+                    <th>과목명</th>
+                    <th>학점</th>
+                    <th>출석점수</th>
+                    <th>과제점수</th>
+                    <th>중간고사</th>
+                    <th>기밀고사</th>
+                    <th>총점</th>
+                    <th>평균</th>
+                    <th>성적</th>
+                </thead>
+                <tbody id='content'>
+                    
+                </tbody>
+                <tr>
+                    <td colspan="3">합계</td>
+                    <td id="total-point"></td>
+                    <td id="total-attendance"></td>
+                    <td id="total-homework"></td>
+                    <td id="total-mid"></td>
+                    <td id="total-final"></td>
+                    <td id="total-score"></td>
+                    <td id="total-avg"></td>
+                    <td id="total-grade"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let rowIndex = 0;
+        const addTr = (subject = {}) => {
+            rowIndex++;
+            const tbody = document.getElementById('content');
+            const tr = document.createElement('tr');
+            tr.id = `subject-${rowIndex}`;
+            tr.innerHTML = `
+                <td>
+                    <select id="subject-type-${rowIndex}">
+                        <option value='1' ${subject.type === "1" && 'selected="selected"'}>교양</option>
+                        <option value='2' ${subject.type === "2" && 'selected="selected"'}>전공</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="subject-require-${rowIndex}">
+                        <option value='1' ${subject.require === "1" && 'selected="selected"'}>선택</option>
+                        <option value='2' ${subject.require === "2" && 'selected="selected"'}>필수</option>
+                        <option value='3' ${subject.require === "3" && 'selected="selected"'}>온강</option>
+                    </select>
+                </td>
+                <td><input type='text' id="subject-name-${rowIndex}" value=${subject.name || ""}></td>
+                <td><input type='text' id="subject-point-${rowIndex}" value=${subject.point || ""}></td>
+                <td><input type='text' id="subject-attendance-${rowIndex}" value="${subject.attendance || ''}" onchange=score(${rowIndex})></td>
+                <td><input type='text' id="subject-homework-${rowIndex}" value="${subject.homework || ''}" onchange=score(${rowIndex})></td>
+                <td><input type='text' id="subject-mid-${rowIndex}" value="${subject.mid || ''}" onchange=score(${rowIndex})></td>
+                <td><input type='text' id="subject-final-${rowIndex}" value="${subject.final || ''}" onchange=score(${rowIndex})></td>
+                <td id="subject-score-${rowIndex}">${subject.score || ""}</td>
+                <td id="subject-avg-${rowIndex}">${subject.avg || ""}</td>
+                <td id="subject-grade-${rowIndex}" style="color:${subject.color || '#101010'}">${subject.grade || ""}</td>
+            `
+            tbody.appendChild(tr);
+        }
+
+        const gradeScore = {
+            96: 'A+',
+            91: 'A0',
+            86: 'B+',
+            81: 'B0',
+            76: 'C+',
+            71: 'C0',
+            66: 'D+',
+            61: 'D0',
+            0: 'F'
+        }
+
+        const score = (id) => {
+            console.log(id)
+            const sum = parseInt(document.getElementById(`subject-attendance-${id}`).value || 0) + parseInt(document.getElementById(`subject-homework-${id}`).value || 0) + parseInt(document.getElementById(`subject-mid-${id}`).value || 0) + parseInt(document.getElementById(`subject-final-${id}`).value || 0)
+            const index = Object.keys(gradeScore).sort((a,b) => b-a).find(g => {
+                if (sum >= parseInt(g)) {
+                    return true
+                }
+
+                return false
+            })
+            const grade = gradeScore[index];
+
+            document.getElementById(`subject-score-${id}`).innerText = sum
+            document.getElementById(`subject-grade-${id}`).innerText = grade
+
+            let color = '#101010';
+            if (grade === 'F') {
+                color = 'red'
+            }
+            document.getElementById(`subject-grade-${id}`).style.color = color
+        }
+
+        const remove = () => {
+            document.getElementById('content').innerHTML = '';
+            addTr();
+        }
+
+        const save = () => {
+            const rowLength = document.getElementById('content').rows.length;
+
+            let point = 0;
+            let attendance = 0;
+            let homework = 0;
+            let mid = 0;
+            let final = 0;
+
+            for (let i = 0; i < rowLength; i++) {
+                const trId = document.getElementById('content').rows[i].id;
+                const index = trId.split('-')[1];
+
+                point += parseInt(document.getElementById(`subject-point-${index}`).value || 0);
+                attendance += parseInt(document.getElementById(`subject-attendance-${index}`).value || 0);
+                homework += parseInt(document.getElementById(`subject-homework-${index}`).value || 0);
+                mid += parseInt(document.getElementById(`subject-mid-${index}`).value || 0);
+                final += parseInt(document.getElementById(`subject-final-${index}`).value || 0);
+            }
+
+            document.getElementById('total-point').innerText = point;
+            document.getElementById('total-attendance').innerText = attendance;
+            document.getElementById('total-homework').innerText = homework;
+            document.getElementById('total-mid').innerText = mid;
+            document.getElementById('total-final').innerText = final;
+
+            const totalScore = attendance + homework + mid + final;
+            const totalAvg = Math.round(totalScore / rowLength, 1);
+            const totalIndex = Object.keys(gradeScore).sort((a,b) => b-a).find(g => {
+                if (totalAvg >= parseInt(g)) {
+                    return true
+                }
+
+                return false
+            })
+            const grade = gradeScore[totalIndex];
+
+            document.getElementById('total-score').innerText = totalScore
+            document.getElementById('total-avg').innerText = totalAvg
+            document.getElementById('total-grade').innerText = grade
+            
+            let color = "#101010";
+            if (grade === 'F') {
+                color = 'red'
+            }
+            document.getElementById(`total-grade`).style.color = color
+        }
+
+        const sort = () => {
+            const rowLength = document.getElementById('content').rows.length;
+
+            const subject = [];
+
+            for (let i = 0; i < rowLength; i++) {
+                const trId = document.getElementById('content').rows[i].id;
+                const index = trId.split('-')[1];
+
+                subject.push({
+                    type: document.getElementById(`subject-type-${index}`).value,
+                    require: document.getElementById(`subject-require-${index}`).value,
+                    name: document.getElementById(`subject-name-${index}`).value,
+                    point: document.getElementById(`subject-point-${index}`).value,
+                    attendance: document.getElementById(`subject-attendance-${index}`).value,
+                    homework: document.getElementById(`subject-homework-${index}`).value,
+                    mid: document.getElementById(`subject-mid-${index}`).value,
+                    final: document.getElementById(`subject-final-${index}`).value,
+                    score:document.getElementById(`subject-score-${index}`).innerText,
+                    avg:document.getElementById(`subject-avg-${index}`).innerText,
+                    grade:document.getElementById(`subject-grade-${index}`).innerText,
+                    color: document.getElementById(`subject-grade-${index}`).innerText === 'F' ? 'red' : '#101010'
+                })
+            }
+
+            console.log(subject);
+
+            subject.sort((a, b) => {
+                if (a.type > b.type) {
+                    return 1
+                }
+                if (a.type < b.type) {
+                    return -1
+                }
+
+                if (a.require > b.require) {
+                    return 1
+                }
+                if (a.require < b.require) {
+                    return -1
+                }
+
+                if (a.name > b.name) {
+                    return 1
+                } else if (a.name < b.name) {
+                    return -1
+                } else {
+                    return 0
+                }
+            })
+
+            document.getElementById('content').innerHTML = "";
+
+            subject.map((s) => {
+                addTr(s)
+            });
+        }
+    </script>
+
+</body>
+</html>
