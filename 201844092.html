@@ -46,7 +46,12 @@
             padding-left: 5px;
             border: none;
             background: transparent;
+            text-align: center;
         }
+        .subName{
+            text-align: left;
+        }
+        
     </style>
     <h1>201844092 이진호 Front-end 과제</h1>
 </head>
@@ -170,7 +175,7 @@
         const gradeScore = { //학점 계산에 사용 될 값
             95: 'A+', 90: 'A0', 85: 'B+', 80: 'B0', 75: 'C+', 70: 'C0', 65: 'D+', 60: 'D0', 0: 'F'}
 
-        $('#delBtn').click(function() { //행 선택 후 삭제 함수
+        $('#delBtn').click(function() { //행 선택 후 삭제 함수1
             if($("input:checkbox[name='Chk_list']:checked").length === 0){
                 alert("삭제할 항목을 선택하시오.");
                 return;}
@@ -182,7 +187,7 @@
             rezore(); //변수값 초기화
         });
 
-        $('#delBtn2').click(function() { //행 선택 후 삭제 함수
+        $('#delBtn2').click(function() { //행 선택 후 삭제 함수2
             if($("input:checkbox[name='Chk_list']:checked").length === 0){
                 alert("삭제할 항목을 선택하시오.");
                 return;}
@@ -194,7 +199,7 @@
             rezore(); //변수값 초기화
         });
 
-        $('#delBtn3').click(function() { //행 선택 후 삭제 함수
+        $('#delBtn3').click(function() { //행 선택 후 삭제 함수3
             if($("input:checkbox[name='Chk_list']:checked").length === 0){
                 alert("삭제할 항목을 선택하시오.");
                 return;}
@@ -229,12 +234,12 @@
                         <option value='3'>온강</option>
                     </select>
                 </td>
-                <td><input type='text' id="subject-name1-${rowIndex}" value=${subject.name || ""}></td>
-                <td><input type='text' id="subject-point1-${rowIndex}" value=${subject.point || ""}></td>
-                <td><input type='text' id="subject-attendance1-${rowIndex}" value="${subject.attendance || ''}" onchange=score1(${rowIndex})></td>
-                <td><input type='text' id="subject-homework1-${rowIndex}" value="${subject.homework || ''}" onchange=score1(${rowIndex})></td>
-                <td><input type='text' id="subject-mid1-${rowIndex}" value="${subject.mid || ''}" onchange=score1(${rowIndex})></td>
-                <td><input type='text' id="subject-final1-${rowIndex}" value="${subject.final || ''}" onchange=score1(${rowIndex})></td>
+                <td><input type='text' id="subject-name1-${rowIndex}" class="subName" value=${subject.name || ""}></td>
+                <td><input type='number' id="subject-point1-${rowIndex}" value=${subject.point || ""}></td>
+                <td><input type='number' id="subject-attendance1-${rowIndex}" value="${subject.attendance || ''}" onchange=score1(${rowIndex})></td>
+                <td><input type='number' id="subject-homework1-${rowIndex}" value="${subject.homework || ''}" onchange=score1(${rowIndex})></td>
+                <td><input type='number' id="subject-mid1-${rowIndex}" value="${subject.mid || ''}" onchange=score1(${rowIndex})></td>
+                <td><input type='number' id="subject-final1-${rowIndex}" value="${subject.final || ''}" onchange=score1(${rowIndex})></td>
                 <td id="subject-score1-${rowIndex}">${subject.score || ""}</td>
                 <td id="subject-avg1-${rowIndex}">${subject.avg || ""}</td>
                 <td id="subject-grade1-${rowIndex}" style="color:${subject.color || '#101010'}">${subject.grade || ""}</td>
@@ -244,19 +249,31 @@
         }
 
         const score1 = (id) => { //실시간 점수 계산 함수
-            console.log(id)
+            if(parseInt(document.getElementById(`subject-attendance1-${id}`).value)>20){
+                alert("출석점수는 20점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-attendance1-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-homework1-${id}`).value)>20){
+                alert("과제점수는 20점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-homework1-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-mid1-${id}`).value)>30){
+                alert("중간고사점수 30점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-mid1-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-final1-${id}`).value)>30){
+                alert("기말고사점수 30점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-final1-${id}`).value =''
+                return;
+            }
             const sum = parseInt(document.getElementById(`subject-attendance1-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-homework1-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-mid1-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-final1-${id}`).value || 0)
-            if(sum >= 101){ // 총점이 100을 넘길 경우 초기화 후 재입력
-                alert("과목의 총점은 100을 넘을 수 없습니다. 재입력 바랍니다");
-                document.getElementById(`subject-attendance1-${id}`).value =''
-                document.getElementById(`subject-homework1-${id}`).value =''
-                document.getElementById(`subject-mid1-${id}`).value =''
-                document.getElementById(`subject-final1-${id}`).value =''
-                return;
-            }
+
             var selectOption = document.getElementById(`subject-require-${id}`);
             var sb = selectOption.options[selectOption.selectedIndex].value;
             if(sb == 3){ //셀렉트박스의 옵션이 3이면 온강이다.학점은 1 합계는 50이상일시 P 이하면 NP
@@ -293,8 +310,8 @@
         function save1(){ //저장 및 총점 계산 함수
             const rowLength = document.getElementById('content1').rows.length;
             for (let i = 0; i < rowLength; i++) {
-                const trId = document.getElementById('content1').rows[i].id;
-                const index = trId.split('-')[1];
+                var trId = document.getElementById('content1').rows[i].id;
+                var index = trId.split('-')[1];    
                 point += parseInt(document.getElementById(`subject-point1-${index}`).value || 0);
                 attendance += parseInt(document.getElementById(`subject-attendance1-${index}`).value || 0);
                 homework += parseInt(document.getElementById(`subject-homework1-${index}`).value || 0);
@@ -308,20 +325,47 @@
             document.getElementById('final1').innerText = final;
             totalScore = attendance + homework + mid + final;
             totalAvg = Math.round(totalScore / rowLength, 1);
-            totalIndex = Object.keys(gradeScore).sort((a,b) => b-a).find(g => {
-                if (totalAvg >= parseInt(g)) {
-                    return true
+            
+            var table = document.getElementById("tbl1")
+            var totalGrade = 0;
+            for (let i = 1; i < table.rows.length-1; i++) {
+                if(table.rows[i].cells[10].innerText=="A+"){
+                    totalGrade += 4.5*Number(table.rows[i].cells[3].children[0].value);
                 }
-                return false
-            })
-            grade = gradeScore[totalIndex];
+                else if(table.rows[i].cells[10].innerText=="A0"){
+                    totalGrade += 4.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="B+"){
+                    totalGrade += 3.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="B0"){
+                    totalGrade += 3.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="C+"){
+                    totalGrade += 2.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="C0"){
+                    totalGrade += 2.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="D+"){
+                    totalGrade += 1.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="D0"){
+                    totalGrade += 1.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+            }
+            var stdCount = 0;
+            for(let i = 1; i < table.rows.length-1; i++){
+                if(String(table.rows[i].cells[1].children[0].options[table.rows[i].cells[1].children[0].selectedIndex].value)=="3"){ //온강의 학점은 총 학점계산에서 제외됨.
+                    stdCount += Number(table.rows[i].cells[3].children[0].value); //몇 학점인지 확인후 
+                }else{
+                    continue;
+                }
+            }
+            totalGrade = totalGrade / (Number(table.rows[table.rows.length-1].cells[1].innerText)-stdCount)    
             document.getElementById('score1').innerText = totalScore;
             document.getElementById('avg1').innerText = totalAvg;
-            document.getElementById('grade1').innerText = grade;
-            let color = "#101010";
-            if (grade === 'F') {
-                color = 'red'}
-            document.getElementById(`grade1`).style.color = color;
+            document.getElementById('grade1').innerText = Math.round(totalGrade*100)/100 + "학점"; //소수2째자리까지 표현
             rezore();//변수값 초기화
         }
 
@@ -386,12 +430,12 @@
                         <option value='3'>온강</option>
                     </select>
                 </td>
-                <td><input type='text' id="subject-name2-${rowIndex}" value=${subject.name || ""}></td>
-                <td><input type='text' id="subject-point2-${rowIndex}" value=${subject.point || ""}></td>
-                <td><input type='text' id="subject-attendance2-${rowIndex}" value="${subject.attendance || ''}" onchange=score2(${rowIndex})></td>
-                <td><input type='text' id="subject-homework2-${rowIndex}" value="${subject.homework || ''}" onchange=score2(${rowIndex})></td>
-                <td><input type='text' id="subject-mid2-${rowIndex}" value="${subject.mid || ''}" onchange=score2(${rowIndex})></td>
-                <td><input type='text' id="subject-final2-${rowIndex}" value="${subject.final || ''}" onchange=score2(${rowIndex})></td>
+                <td><input type='text' id="subject-name2-${rowIndex}" class="subName" value=${subject.name || ""}></td>
+                <td><input type='number' id="subject-point2-${rowIndex}" value=${subject.point || ""}></td>
+                <td><input type='number' id="subject-attendance2-${rowIndex}" value="${subject.attendance || ''}" onchange=score2(${rowIndex})></td>
+                <td><input type='number' id="subject-homework2-${rowIndex}" value="${subject.homework || ''}" onchange=score2(${rowIndex})></td>
+                <td><input type='number' id="subject-mid2-${rowIndex}" value="${subject.mid || ''}" onchange=score2(${rowIndex})></td>
+                <td><input type='number' id="subject-final2-${rowIndex}" value="${subject.final || ''}" onchange=score2(${rowIndex})></td>
                 <td id="subject-score2-${rowIndex}">${subject.score || ""}</td>
                 <td id="subject-avg2-${rowIndex}">${subject.avg || ""}</td>
                 <td id="subject-grade2-${rowIndex}" style="color:${subject.color || '#101010'}">${subject.grade || ""}</td>
@@ -401,19 +445,31 @@
         }
 
         const score2 = (id) => { //실시간 점수 계산 함수
-            console.log(id)
+            if(parseInt(document.getElementById(`subject-attendance2-${id}`).value)>20){
+                alert("출석점수는 20점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-attendance2-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-homework2-${id}`).value)>20){
+                alert("과제점수는 20점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-homework2-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-mid2-${id}`).value)>30){
+                alert("중간고사점수 30점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-mid2-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-final2-${id}`).value)>30){
+                alert("기말고사점수 30점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-final2-${id}`).value =''
+                return;
+            }
             const sum = parseInt(document.getElementById(`subject-attendance2-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-homework2-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-mid2-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-final2-${id}`).value || 0)
-            if(sum >= 101){ // 총점이 100을 넘길 경우 초기화 후 재입력
-                alert("과목의 총점은 100을 넘을 수 없습니다. 재입력 바랍니다");
-                document.getElementById(`subject-attendance2-${id}`).value =''
-                document.getElementById(`subject-homework2-${id}`).value =''
-                document.getElementById(`subject-mid2-${id}`).value =''
-                document.getElementById(`subject-final2-${id}`).value =''
-                return;
-            }
+
             var selectOption = document.getElementById(`subject-require-${id}`);
             var sb = selectOption.options[selectOption.selectedIndex].value;
             if(sb == 3){ //셀렉트박스의 옵션이 3이면 온강이다.학점은 1 합계는 50이상일시 P 이하면 NP
@@ -464,20 +520,46 @@
             document.getElementById('final2').innerText = final;
             totalScore = attendance + homework + mid + final;
             totalAvg = Math.round(totalScore / rowLength, 1);
-            totalIndex = Object.keys(gradeScore).sort((a,b) => b-a).find(g => {
-                if (totalAvg >= parseInt(g)) {
-                    return true
+            var table = document.getElementById("tbl2")
+            var totalGrade = 0;
+            for (let i = 1; i < table.rows.length-1; i++) {
+                if(table.rows[i].cells[10].innerText=="A+"){
+                    totalGrade += 4.5*Number(table.rows[i].cells[3].children[0].value);
                 }
-                return false
-            })
-            grade = gradeScore[totalIndex];
+                else if(table.rows[i].cells[10].innerText=="A0"){
+                    totalGrade += 4.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="B+"){
+                    totalGrade += 3.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="B0"){
+                    totalGrade += 3.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="C+"){
+                    totalGrade += 2.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="C0"){
+                    totalGrade += 2.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="D+"){
+                    totalGrade += 1.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="D0"){
+                    totalGrade += 1.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+            }
+            var stdCount = 0;
+            for(let i = 1; i < table.rows.length-1; i++){
+                if(String(table.rows[i].cells[1].children[0].options[table.rows[i].cells[1].children[0].selectedIndex].value)=="3"){
+                    stdCount += Number(table.rows[i].cells[3].children[0].value);
+                }else{
+                    continue;
+                }
+            }
+            totalGrade = totalGrade / (Number(table.rows[table.rows.length-1].cells[1].innerText)-stdCount)    
             document.getElementById('score2').innerText = totalScore;
             document.getElementById('avg2').innerText = totalAvg;
-            document.getElementById('grade2').innerText = grade;
-            let color = "#101010";
-            if (grade === 'F') {
-                color = 'red'}
-            document.getElementById(`grade2`).style.color = color;
+            document.getElementById('grade2').innerText = Math.round(totalGrade*100)/100 + "학점";
             rezore();//변수값 초기화
         }
 
@@ -541,12 +623,12 @@
                         <option value='3'>온강</option>
                     </select>
                 </td>
-                <td><input type='text' id="subject-name3-${rowIndex}" value=${subject.name || ""}></td>
-                <td><input type='text' id="subject-point3-${rowIndex}" value=${subject.point || ""}></td>
-                <td><input type='text' id="subject-attendance3-${rowIndex}" value="${subject.attendance || ''}" onchange=score3(${rowIndex})></td>
-                <td><input type='text' id="subject-homework3-${rowIndex}" value="${subject.homework || ''}" onchange=score3(${rowIndex})></td>
-                <td><input type='text' id="subject-mid3-${rowIndex}" value="${subject.mid || ''}" onchange=score3(${rowIndex})></td>
-                <td><input type='text' id="subject-final3-${rowIndex}" value="${subject.final || ''}" onchange=score3(${rowIndex})></td>
+                <td><input type='text' id="subject-name3-${rowIndex}" class="subName" value=${subject.name || ""}></td>
+                <td><input type='number' id="subject-point3-${rowIndex}" value=${subject.point || ""}></td>
+                <td><input type='number' id="subject-attendance3-${rowIndex}" value="${subject.attendance || ''}" onchange=score3(${rowIndex})></td>
+                <td><input type='number' id="subject-homework3-${rowIndex}" value="${subject.homework || ''}" onchange=score3(${rowIndex})></td>
+                <td><input type='number' id="subject-mid3-${rowIndex}" value="${subject.mid || ''}" onchange=score3(${rowIndex})></td>
+                <td><input type='number' id="subject-final3-${rowIndex}" value="${subject.final || ''}" onchange=score3(${rowIndex})></td>
                 <td id="subject-score3-${rowIndex}">${subject.score || ""}</td>
                 <td id="subject-avg3-${rowIndex}">${subject.avg || ""}</td>
                 <td id="subject-grade3-${rowIndex}" style="color:${subject.color || '#101010'}">${subject.grade || ""}</td>
@@ -557,18 +639,31 @@
 
         const score3 = (id) => { //실시간 점수 계산 함수
             console.log(id)
+            if(parseInt(document.getElementById(`subject-attendance3-${id}`).value)>20){
+                alert("출석점수는 20점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-attendance3-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-homework3-${id}`).value)>20){
+                alert("과제점수는 20점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-homework3-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-mid3-${id}`).value)>30){
+                alert("중간고사점수 30점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-mid3-${id}`).value =''
+                return;
+            }
+            if(parseInt(document.getElementById(`subject-final3-${id}`).value)>30){
+                alert("기말고사점수 30점 까지 입력 가능합니다. 재입력 바랍니다");
+                document.getElementById(`subject-final3-${id}`).value =''
+                return;
+            }
             const sum = parseInt(document.getElementById(`subject-attendance3-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-homework3-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-mid3-${id}`).value || 0)
             + parseInt(document.getElementById(`subject-final3-${id}`).value || 0)
-            if(sum >= 101){ // 총점이 100을 넘길 경우 초기화 후 재입력
-                alert("과목의 총점은 100을 넘을 수 없습니다. 재입력 바랍니다");
-                document.getElementById(`subject-attendance3-${id}`).value =''
-                document.getElementById(`subject-homework3-${id}`).value =''
-                document.getElementById(`subject-mid3-${id}`).value =''
-                document.getElementById(`subject-final3-${id}`).value =''
-                return;
-            }
+
             var selectOption = document.getElementById(`subject-require-${id}`);
             var sb = selectOption.options[selectOption.selectedIndex].value;
             if(sb == 3){ //셀렉트박스의 옵션이 3이면 온강이다.학점은 1 합계는 50이상일시 P 이하면 NP
@@ -616,19 +711,46 @@
             document.getElementById('final3').innerText = final;
             totalScore = attendance + homework + mid + final;
             totalAvg = Math.round(totalScore / rowLength, 1);
-            totalIndex = Object.keys(gradeScore).sort((a,b) => b-a).find(g => {
-                if (totalAvg >= parseInt(g)) {
-                    return true}
-                return false
-            })
-            grade = gradeScore[totalIndex];
+            var table = document.getElementById("tbl3")
+            var totalGrade = 0;
+            for (let i = 1; i < table.rows.length-1; i++) {
+                if(table.rows[i].cells[10].innerText=="A+"){
+                    totalGrade += 4.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="A0"){
+                    totalGrade += 4.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="B+"){
+                    totalGrade += 3.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="B0"){
+                    totalGrade += 3.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="C+"){
+                    totalGrade += 2.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="C0"){
+                    totalGrade += 2.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="D+"){
+                    totalGrade += 1.5*Number(table.rows[i].cells[3].children[0].value);
+                }
+                else if(table.rows[i].cells[10].innerText=="D0"){
+                    totalGrade += 1.0*Number(table.rows[i].cells[3].children[0].value);
+                }
+            }
+            var stdCount = 0;
+            for(let i = 1; i < table.rows.length-1; i++){
+                if(String(table.rows[i].cells[1].children[0].options[table.rows[i].cells[1].children[0].selectedIndex].value)=="3"){
+                    stdCount += Number(table.rows[i].cells[3].children[0].value);
+                }else{
+                    continue;
+                }
+            }
+            totalGrade = totalGrade / (Number(table.rows[table.rows.length-1].cells[1].innerText)-stdCount)    
             document.getElementById('score3').innerText = totalScore;
             document.getElementById('avg3').innerText = totalAvg;
-            document.getElementById('grade3').innerText = grade;
-            let color = "#101010";
-            if (grade === 'F') {
-                color = 'red'}
-            document.getElementById(`grade3`).style.color = color;
+            document.getElementById('grade3').innerText = Math.round(totalGrade*100)/100 + "학점";
             rezore();//변수값 초기화
         }
 
